@@ -19,10 +19,17 @@
   crossorigin="anonymous"></script>
   
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+  
+ 
+
+  
   <link rel="stylesheet" 
   href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
   integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
   crossorigin="anonymous">
+  
+
   
   
   <script src="jquery-book.js"></script>
@@ -35,18 +42,47 @@
 
 	$(document).ready(function(){
 	
-		$thing = $('.book').book({prevPage:updateProgress, nextPage:updateProgress});
+		$thing = $('.book').book({prevPage:updateProgress, nextPage:updateProgress, speed:200});
 	
 		function updateProgress(currentPageIndex, pageCount){
 			t = (currentPageIndex / (pageCount-1)) * 100;
 			
 			$('.progress-bar').attr('aria-valuenow', t);
 			$('.progress-bar').css('width', t+'%');
-			$('.progress span').text('Completed: '+Math.trunc(t)+'%');
+			//$('.progress span').text('Completed: '+Math.trunc(t)+'%');
+			$('.progress-value').text(Math.trunc(t)+'%');
+			
 		}
+		
+		
+		$('#demo').validate({
+			//ignore: [],
+			rules:{
+				fname: {
+					required: true,
+					minlength: 3
+				},
+				lname: {
+					required: true
+				}
+			}
+		});
+		
+		
+		
+		
+		
+		$('#sendForm').on('click', function(e){
+			e.preventDefault();
+			
+			if ($('#demo').valid()){
+				// do ajax thingy here
+			}
+		});
+		
 	
 		
-	});
+	}); // end document ready
 	
 
 </script>
@@ -54,9 +90,15 @@
 
 <style type="text/css">
 	
-	.myBook{background:#eee;border:1px solid #ddd;padding:8px;height:500px;}
+	.myBook{background:#eee;border:1px solid #ddd;padding:8px;height:400px;border-radius:6px;}
+	.myBook section button{position:absolute;bottom:0;}
+	.page-next{right:0}
 	
-	.progress {position:relative;}
+
+	label.error{color:red;} <!-- jquery.validate -->
+	
+	<!--
+	.progress {position:relative; }
 	.progress span {
 		position:absolute;
 		left:0;
@@ -65,6 +107,58 @@
 		z-index:2;
 		font-weigh:bold;
 	}
+	-->
+	
+	.progress{
+		
+		height: 25px;
+		background: #262626;
+		padding: 5px;
+		overflow: visible;
+		border-radius: 20px;
+		border-top: 1px solid #000;
+		border-bottom: 1px solid #7992a8;
+		margin-top: 50px;
+	}
+	
+	.progress .progress-bar{
+		border-radius: 20px;
+		position: relative;
+		animation: animate-positive 2s;
+	}
+	.progress .progress-value{
+		display: block;
+		padding: 3px 7px;
+		font-size: 13px;
+		color: #fff;
+		border-radius: 4px;
+		background: #191919;
+		border: 1px solid #000;
+		position: absolute;
+		top: -40px;
+		right: -10px;
+	}
+	.progress .progress-value:after{
+		content: "";
+		border-top: 10px solid #191919;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		position: absolute;
+		bottom: -6px;
+		left: 26%;
+	}
+	.progress-bar.active{
+		animation: reverse progress-bar-stripes 0.40s linear infinite, animate-positive 2s;
+	}
+	@-webkit-keyframes animate-positive{
+		0% { width: 0; }
+	}
+	@keyframes animate-positive{
+		0% { width: 0; }
+	}
+
+	
+	body{background: linear-gradient(to right, #2c3b4e, #4a688a, #2c3b4e);}
 </style>
 
 	
@@ -77,43 +171,52 @@
 
 <div class="container-fluid" style="margin-top:50px;">
 
-	<div class="col-md-6 col-md-offset-3">
+	<div class="col-md-6 col-md-offset-3" style="overflow:hidden;padding:20px">
 	
+	<!--
 		<div class="progress">
 			<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100" >
 			</div>
 			<span style="text-align:center">Completed: 0%</span>
 		</div>
-
-		<div class="book myBook">
-			<div class="page">
-				<label for="fname">First name:</label><br>
-				<input type="text" id="fname" name="fname" value="John"><br>
-				<label for="lname">Last name:</label><br>
-				<input type="text" id="lname" name="lname" value="Doe"><br><br>
-				<button class="page-next">Next</button>
+	-->
+	
+		<div class="progress">
+			<div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%;">
+				<div class="progress-value">0%</div>
 			</div>
-			<div class="page">
-				<input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+		</div>
+
+
+		<form name="demo" id="demo" class="book myBook">
+			<section>
+				<label for="fname">First name:</label><br>
+				<input type="text" id="fname" name="fname" class="form-control" placeholder="John" required><br>
+				<label for="lname">Last name:</label><br>
+				<input type="text" id="lname" name="lname" class="form-control" placeholder="Doe" required><br><br>
+				<button type="button" class="page-next btn btn-primary">Next</button>
+			</section>
+			<section>
+				<input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" >
 				<label for="vehicle1"> I have a bike</label><br>
 				<input type="checkbox" id="vehicle2" name="vehicle2" value="Car">
 				<label for="vehicle2"> I have a car</label><br>
 				<input type="checkbox" id="vehicle3" name="vehicle3" value="Boat">
 				<label for="vehicle3"> I have a boat</label><br/><br>
-				<button class="page-prev">Prev</button>
-				<button class="page-next">Next</button>
-			</div>
-			<div class="page">
+				<button type="button" class="page-prev btn btn-danger">Prev</button>
+				<button type="button" class="page-next btn btn-primary">Next</button>
+			</section>
+			<section class="page">
 				<a href="#">Terms of Service</a><br/>
-				<input type="checkbox" id="ts" name="ts" value="1">
+				<input type="checkbox" id="ts" name="ts" value="1" required>
 				<label for="ts"> I agree</label><br>
-				<button class="page-prev">Prev</button>
-				<button class="page-next" type="submit">Complete</button>
-			</div>
-			<div class="page" style="margin:auto;text-align:center">
+				<button type="button" class="page-prev btn btn-danger">Prev</button>
+				<button type="submit" class="page-next btn btn-success" id="sendForm">Complete</button>
+			</section>
+			<section class="page" style="margin:auto;text-align:center">
 				Your form has been submitted.
-			</div>
-		</div>
+			</section>
+		</form>
 	</div>
 
 </div>
