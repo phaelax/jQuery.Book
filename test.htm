@@ -34,16 +34,57 @@
   
   <script src="jquery-book.js"></script>
   
-	<link href="jquery-book.css" rel="stylesheet" type="text/css">
-	
   
   
 <script>
 
+	/*
+	
+		The <form> tag will be your container and referred to as a Book. The book contains
+		pages, each page is a <section>.  Each section will contain a part of the form you
+		want displayed on that particular page. For the form to navigate between pages it 
+		must include a next or previous button within that page.  These buttons must include
+		the classes "page-next" or "page-prev" to function.  Pages are designed to fit 
+		whatever the dimensions of the book container. This is handled by the plugin so no
+		extra CSS is necessary by the web designer. Attempting to override this will mess up 
+		the animations. The book can be set to any size, or left alone to fill a bootstrap 
+		column and remain responsive.
+	
+	
+		The plugin has 3 options. 
+		'prevPage': 
+		'nextPage': Callbacks for when a page is changed. These are called just before the animation is triggered.
+		'speed'   : The animation speed
+	
+		
+		Dependencies:
+		1. jQuery
+		2. jQuery UI (for the animations)
+		
+		jQuery Validate is not required but is supported and will validate the form per page.
+	
+	
+	
+	*/
+
 	$(document).ready(function(){
 	
-		$thing = $('.book').book({prevPage:updateProgress, nextPage:updateProgress, speed:200});
+		$thing = $('#demo').book({
+			prevPage:updateProgress, 
+			nextPage:updateProgress, 
+			speed:200}
+		).validate();
 	
+	
+		/* IE doesn't have a trunc function */
+		if (!Math.trunc) {
+			Math.trunc = function (v) {
+				return v < 0 ? Math.ceil(v) : Math.floor(v);
+			};
+		}
+
+	
+		/* Update progress bar whenever the page changes */
 		function updateProgress(currentPageIndex, pageCount){
 			t = (currentPageIndex / (pageCount-1)) * 100;
 			
@@ -55,28 +96,13 @@
 		}
 		
 		
-		$('#demo').validate({
-			//ignore: [],
-			rules:{
-				fname: {
-					required: true,
-					minlength: 3
-				},
-				lname: {
-					required: true
-				}
-			}
-		});
-		
-		
-		
-		
-		
+		/* form's submit button */
 		$('#sendForm').on('click', function(e){
 			e.preventDefault();
 			
 			if ($('#demo').valid()){
 				// do ajax thingy here
+				alert('Your data was sent.');
 			}
 		});
 		
@@ -188,7 +214,7 @@
 		</div>
 
 
-		<form name="demo" id="demo" class="book myBook">
+		<form name="demo" id="demo" class="myBook">
 			<section>
 				<label for="fname">First name:</label><br>
 				<input type="text" id="fname" name="fname" class="form-control" placeholder="John" required><br>
